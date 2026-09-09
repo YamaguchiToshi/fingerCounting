@@ -5,25 +5,38 @@
   padding: 0;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f8fafc;
   color: #1e293b;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .app-container {
   width: 100%;
   max-width: 900px;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px;
+  /* iPad全画面時のノッチやホームバー対応（Safe Area Insets） */
+  padding: max(20px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   position: relative;
 }
 
