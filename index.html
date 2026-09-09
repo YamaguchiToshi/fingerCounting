@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finger Counting - プロトタイプ</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- MediaPipe Hands & Camera Utils CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- ヘッダー（極小の視覚ノイズ） -->
+    <header class="header">
+      <div class="status-badge" id="statusBadge">カメラ準備中...</div>
+      <button id="openSettingsBtn" class="settings-gear-btn" type="button" aria-label="設定">⚙️</button>
+    </header>
+
+    <!-- 設定モーダル（通常時は隠す） -->
+    <div id="settingsModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>設定</h3>
+          <button id="closeSettingsBtn" class="modal-close-btn" type="button">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- カウント方式の切り替え -->
+          <div class="setting-item">
+            <label class="setting-label">カウント方式</label>
+            <div class="setting-segmented-control">
+              <label class="segment-option">
+                <input type="radio" name="countMode" value="fold" checked id="modeFold">
+                <span>指を曲げてカウント</span>
+              </label>
+              <label class="segment-option">
+                <input type="radio" name="countMode" value="extend" id="modeExtend">
+                <span>指を立ててカウント</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 音声読み上げ -->
+          <div class="setting-item">
+            <div class="setting-row">
+              <label for="settingVoice" class="setting-label-clickable">音声読み上げ</label>
+              <input type="checkbox" id="settingVoice" class="toggle-checkbox" checked>
+            </div>
+          </div>
+
+          <!-- 動作安定化（確定フレーム数）の調整 -->
+          <div class="setting-item">
+            <div class="setting-row">
+              <label for="settingStableFrames" class="setting-label">動作安定化（確定までのフレーム数）</label>
+              <span class="setting-value-badge" id="stableFramesDisplay">10 フレーム (約0.3秒)</span>
+            </div>
+            <div class="slider-container">
+              <input type="range" id="settingStableFrames" min="3" max="25" step="1" value="10" class="setting-slider">
+              <div class="slider-ticks">
+                <span>素早い (3)</span>
+                <span>標準 (10)</span>
+                <span>じっくり安定 (25)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Special オプション -->
+          <div class="setting-item">
+            <div class="setting-row">
+              <label for="settingSpecial" class="setting-label-clickable">Special</label>
+              <input type="checkbox" id="settingSpecial" class="toggle-checkbox">
+            </div>
+          </div>
+
+          <!-- デバッグ表示 -->
+          <div class="setting-item">
+            <div class="setting-row">
+              <label for="settingDebug" class="setting-label-clickable">開発者デバッグ表示（カメラ映像・骨格）</label>
+              <input type="checkbox" id="settingDebug" class="toggle-checkbox">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- メインUI（不要な視覚刺激を排除した表示） -->
+    <main class="main-display">
+      <!-- カウント数字表示（余計なテキストは排除） -->
+      <div class="count-display" id="countDisplay">0</div>
+
+      <!-- 丸い印（10個のドットインジケーター） -->
+      <div class="dots-container" id="dotsContainer">
+        <!-- 10個の丸（5個ずつ区切れるようCSSでレイアウト） -->
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+        <span class="dot" data-index="4"></span>
+        <span class="dot" data-index="5"></span>
+        <span class="dot-separator"></span>
+        <span class="dot" data-index="6"></span>
+        <span class="dot" data-index="7"></span>
+        <span class="dot" data-index="8"></span>
+        <span class="dot" data-index="9"></span>
+        <span class="dot" data-index="10"></span>
+      </div>
+
+      <!-- 手の検出ガイドメッセージ -->
+      <p class="guide-text" id="guideText">カメラに手をかざしてください</p>
+    </main>
+
+    <!-- デバッグ表示パネル（初期状態は非表示） -->
+    <aside class="debug-panel hidden" id="debugPanel">
+      <div class="debug-video-container">
+        <!-- カメラ映像要素（通常時は非表示） -->
+        <video id="webcam" autoplay playsinline muted></video>
+        <!-- 骨格描画用キャンバス -->
+        <canvas id="outputCanvas"></canvas>
+      </div>
+      <div class="debug-info" id="debugInfo">
+        <h4>認識ステータス</h4>
+        <div id="debugHandsList">手の検出を待機中...</div>
+      </div>
+  </div>
+
+  <!-- Special演出用：全画面花火キャンバス -->
+  <canvas id="fireworksCanvas"></canvas>
+
+  <script src="app.js"></script>
+</body>
+</html>
