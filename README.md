@@ -47,3 +47,23 @@ MediaPipe Hands を活用した、**不要な視覚刺激を極限まで排除�
    - 動作安定化（確定までのフレーム数調整）
    - Special（カウントダウン花火演出）
    - 開発者デバッグ表示（カメラ映像・骨格表示）
+
+## 開発
+
+ビルドや依存パッケージのインストールは不要です。JavaScript モジュールを使用するため、ローカルでは HTTP サーバー経由で開きます。
+
+```sh
+python3 -m http.server 8000
+```
+
+ブラウザで `http://localhost:8000` を開いてください。公開時は、これまでどおり静的ファイルを GitHub Pages などで配信できます。
+
+- `app.js`: 設定、画面更新、音声読み上げ、MediaPipe・カメラとの連携。
+- `counting.mjs`: 指の判定、カウントの安定化、カウントダウンの状態管理。DOM に依存しません。
+- `fireworks.mjs`: 花火の描画、アニメーション、爆発音。`trigger()` と `stop()` で操作します。
+
+判定ロジックのテストは Node.js 20 以上で実行できます。
+
+```sh
+node --test tests/counting.test.mjs
+```
